@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="/javascripts/instascan.min.js"></script>
+    <title>QRコードスキャン</title>
+</head>
+<body>
+<div>QRコードをカメラにかざしてください</div>
+<video id="preview"></video>
+<ul id="result"></ul>
+<script type="text/javascript">
+    let scanner = new Instascan.Scanner({video: document.getElementById('preview')});
+    scanner.addListener('scan', function (content) {
+        $("#result").append("<li>読み取り成功" + content + "</li>")
+        console.log(content);
+        $.ajax({
+            url: './scan/auth_api',
+            type: 'POST',
+            data: JSON.parse(content)
+        }).done((data) => {
+            if (data.result == true) {
+                $("#result").append("<li>認証成功</li>")
+            } else {
+                $("#result").append("<li>認証失敗</li>")
+            }
+        });
+    });
+    Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+            scanner.start(cameras[0]);
+        } else {
+            console.error('No cameras found.');
+        }
+    }).catch(function (e) {
+        console.error(e);
+    });
+</script>
+</body>
+</html>

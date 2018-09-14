@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <title>管理パネル</title>
+</head>
+<body>
+<div>以下に集計結果が表示されます。結果は10秒ごとに更新されます。</div>
+<div id="result">ロード中</div>
+<script>
+    const updateData = () => {
+        $.ajax({
+            url: '/admin/aggregate_api',
+            type: 'GET'
+        }).done((data) => {
+            $("#result").text(JSON.stringify(data));
+        });
+    }
+    setInterval(
+        updateData()
+        , 10000)
+</script>
+</body>
+</html>
