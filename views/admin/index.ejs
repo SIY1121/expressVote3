@@ -7,23 +7,44 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+    <script src="https://codepen.io/anon/pen/aWapBE.js"></script>
     <title>管理パネル</title>
 </head>
 <body>
 <div>以下に集計結果が表示されます。結果は10秒ごとに更新されます。</div>
 <div id="result">ロード中</div>
+<canvas id="chartCanvas"></canvas>
 <script>
+    const chart = new Chart("chartCanvas", {
+        type: 'doughnut',
+        data: {
+            datasets: [{}]
+        }
+    });
+
+
     const updateData = () => {
         $.ajax({
             url: '/admin/aggregate_api',
             type: 'GET'
         }).done((data) => {
             $("#result").text(JSON.stringify(data));
+
+            chart.data.labels = [];//ラベルクリア
+            chart.data.datasets[0].data = [];//データクリア
+
+            data.forEach((e, i) => {
+                chart.data.labels.push(e._id);
+                chart.data.datasets[0].data.push(e.count)
+                chart.data.datasets[0].backgroundColor = palette('rainbow', data.length).map((hex) => { return '#' + hex;});
+            })
+            chart.update();
+
         });
     }
-    setInterval(
-        updateData()
-        , 10000)
+    setInterval(updateData , 10000);
+    updateData();
 </script>
 </body>
 </html>

@@ -58,7 +58,10 @@ MongoClient.connect("mongodb://localhost:27017", {useNewUrlParser: true}, (err, 
     }
 
     exports.aggregate = async () => {
-        return await collection.aggregate([{ $group : { "_id"  : "$vote", "count" : { "$sum" : 1 } } }]).toArray()
+        return await collection.aggregate([
+            {$group: {"_id": "$vote", "count": {"$sum": 1}}},
+            {$sort: {count: -1}}
+        ]).toArray()
     }
 
 });
